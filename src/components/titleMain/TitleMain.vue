@@ -71,7 +71,6 @@ export default{
         id: localStorage.getItem('user')
       },
       success: res => {
-        console.log(res.data)
         that.userInfo = res.data
       }
     })
@@ -191,6 +190,7 @@ export default{
   box-shadow: 0 1px 6px rgba(0,0,0,.2);
   text-align: center;
   color: #333333;
+  background-color: white;
 }
 
 /* 可以设置不同的进入和离开动画 */

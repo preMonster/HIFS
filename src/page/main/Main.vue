@@ -38,6 +38,13 @@ export default{
   min-height:100%;
   color: #2c3e50;
   display: flex;
+  background: #EDEDED;
+}
+
+.module-card{
+  width: 95%;
+  margin: 20px auto;
+  min-height: 500px;
 }
 
 .sidebarMain{
