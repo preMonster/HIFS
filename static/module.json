@@ -1,5 +1,6 @@
 [{
     "id": "0",
+    "title":"系统管理",
     "name": "系统管理",
     "code": "xtgl-s00",
     "parentCode": "",
@@ -9,6 +10,7 @@
     "describe": "系统管理",
     "children": [{
         "id": "01",
+        "title":"模块管理",
         "name": "模块管理",
         "code": "xtgl-s01",
         "parentCode": "xtgl-s00",
@@ -21,6 +23,7 @@
 }, {
     "id": "1",
     "name": "基础管理",
+    "title":"基础管理",
     "code": "jcgl-s00",
     "parentCode": "",
     "level": "1",
@@ -30,6 +33,7 @@
     "children": [{
         "id": "11",
         "name": "区域管理",
+        "title":"区域管理",
         "code": "jcgl-s01",
         "parentCode": "jcgl-s00",
         "parentName": "基础管理",

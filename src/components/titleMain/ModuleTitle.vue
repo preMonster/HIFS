@@ -1,5 +1,5 @@
 <template>
-    <Card class="Title-title">
+    <Card class="Title-title-card">
         <div class="flex-box">
             <div>
                 <icon :type="iconName"></icon>
@@ -13,13 +13,13 @@
 
 <script>
 export default{
-  name: 'title',
+  name: 'ModuleTitle',
   props: ['iconName', 'moduleName']
 }
 </script>
 
 <style>
-.Title-title{
+.Title-title-card{
     width: 95%;
     margin: 20px auto;
     padding: 0px 20px;

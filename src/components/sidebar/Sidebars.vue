@@ -5,76 +5,76 @@
     </div>
     <div class="sidebarContent">
         <Menu theme="dark">
-                <Submenu key="1">
+                <Submenu name="xtgl" key="1">
                     <template slot="title">
                     <Icon type="gear-b"></Icon>
                         系统管理
                     </template>
-                    <router-link :to="'/module'"><Menu-item key="1-1">
+                    <router-link :to="'/module'"><Menu-item name="mkgl" key="1-1">
                     <Icon type="paper-airplane"></Icon>
                     模块管理</Menu-item></router-link>
-                    <Menu-item key="1-2">
+                    <Menu-item name="jsgl" key="1-2">
                     <Icon type="paper-airplane"></Icon>
                     角色管理</Menu-item>
-                    <Menu-item key="1-3">
+                    <Menu-item name="jsfp" key="1-3">
                     <Icon type="paper-airplane"></Icon>
                     角色分配</Menu-item>
-                    <Menu-item key="1-4">
+                    <Menu-item name="yhgl" key="1-4">
                     <Icon type="paper-airplane"></Icon>
                     用户管理</Menu-item>
                 </Submenu>
-                <Submenu key="2">
+                <Submenu name="jcgl"  key="2">
                     <template slot="title">
                         <Icon type="home"></Icon>
                         基础管理
                     </template>
-                    <Menu-item key="2-1">
+                    <Menu-item name="qugl" key="2-1">
                     <Icon type="paper-airplane"></Icon>
                     区域管理</Menu-item>
-                    <Menu-item key="2-2">
+                    <Menu-item name="clxq" key="2-2">
                     <Icon type="paper-airplane"></Icon>
                     车辆详情</Menu-item>
-                    <Menu-item key="2-2">
+                    <Menu-item name="wfjcxx" key="2-3">
                     <Icon type="paper-airplane"></Icon>
                     违法基础信息</Menu-item>
                 </Submenu>
-                <Submenu key="3">
+                <Submenu name="wfqz"  key="3">
                     <template slot="title">
                         <Icon type="ios-people"></Icon>
                         违法取证
                     </template>
-                    <Menu-item key="3-1">
+                    <Menu-item name="wfjl" key="3-1">
                     <Icon type="paper-airplane"></Icon>
                     违法记录</Menu-item>
-                    <Menu-item key="3-2">
+                    <Menu-item name="lsjl" key="3-2">
                     <Icon type="paper-airplane"></Icon>
                     违法历史记录</Menu-item>
                 </Submenu>
-                <Submenu key="4">
+                <Submenu name="tjfx"  key="4">
                     <template slot="title">
                         <Icon type="stats-bars"></Icon>
                         统计分析
                     </template>
                     <Menu-group title="高发">
-                        <Menu-item key="4-1">
+                        <Menu-item name="jcfx" key="4-1">
                     <Icon type="paper-airplane"></Icon>
                     基础路段</Menu-item>
-                        <Menu-item key="4-2">
+                        <Menu-item name="yzfx" key="4-2">
                     <Icon type="paper-airplane"></Icon>
                     严重路段分析</Menu-item>
                     </Menu-group>
                     <Menu-group title="个人">
-                        <Menu-item key="4-3">
+                        <Menu-item name="grfx" key="4-3">
                     <Icon type="paper-airplane"></Icon>
                     个人违法分析</Menu-item>
                     </Menu-group>
                 </Submenu>
-                <Submenu key="5">
+                <Submenu name="spgl"  key="5">
                     <template slot="title">
                     <Icon type="videocamera"></Icon>
                         违法视频管理
                     </template>
-                    <Menu-item key="5-1">
+                    <Menu-item name="sphf" key="5-1">
                     <Icon type="paper-airplane"></Icon>
                     视频回放</Menu-item>
                 </Submenu>
