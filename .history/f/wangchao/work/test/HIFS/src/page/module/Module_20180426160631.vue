@@ -19,7 +19,8 @@
                   type="trash-a deleteIcon"
                   title="删除"></Icon>
           </div>
-          <rcTable :tableAttr="tableAttr"></rcTable>
+          <rcTable :data="tableData"
+                   :tableAttr="tableAttr"></rcTable>
         </div>
       </div>
       <ModuleForm :modal="modal"
@@ -45,6 +46,7 @@ export default {
       modal: false,
       spinShow: true,
       modalData: [0, '新增', {}],
+      baseData: [],
       tableAttr: {
         url: 'http://localhost:3001/refresh',
         params: {},
@@ -147,52 +149,53 @@ export default {
               ])
             }
           }]
-      },
-      showFunc: this.show,
-      tableData: {
-        total: 0,
-        data: []
       }
+    },
+      showFunc: this.show,
+        tableData: {
+      total: 0,
+        data: []
     }
-  },
-  components: {
-    IconsChoose,
+  }
+},
+components: {
+  IconsChoose,
     ModuleTitle,
     ModuleForm,
     rcTable
-  },
-  created: function () {
-    ajax.get({
-      url: 'static/module.json',
-      success: res => {
-        this.baseData = res.data.data
-        this.tableData = res.data
-        for (let i in this.tableData.data) {
-          this.tableData.data[i].show = this.show
-          this.tableData.data[i].edit = this.edit
-        }
+},
+created: function () {
+  ajax.get({
+    url: 'static/module.json',
+    success: res => {
+      this.baseData = res.data.data
+      this.tableData = res.data
+      for (let i in this.tableData.data) {
+        this.tableData.data[i].show = this.show
+        this.tableData.data[i].edit = this.edit
       }
-    })
-  },
-  methods: {
-    getIconName (iconName) {
-      this.iconName = iconName
-    },
-    getSelectedTree (data) {
-      console.log(data)
-    },
-    show (index) {
-      this.changeModal(1, index)
-    },
-    edit (index) {
-      this.changeModal(2, index)
-    },
-    changeModal (num, index) {
-      let data = index ? this.tableData[index] : []
-      this.modalData = num === 0 ? [0, '新增', data] : num === 1 ? [1, '查看', data] : [2, '编辑', data]
-      this.modal = !this.modal
     }
+  })
+},
+methods: {
+  getIconName(iconName) {
+    this.iconName = iconName
+  },
+  getSelectedTree(data) {
+    console.log(data)
+  },
+  show(index) {
+    this.changeModal(1, index)
+  },
+  edit(index) {
+    this.changeModal(2, index)
+  },
+  changeModal(num, index) {
+    let data = index ? this.tableData[index] : []
+    this.modalData = num === 0 ? [0, '新增', data] : num === 1 ? [1, '查看', data] : [2, '编辑', data]
+    this.modal = !this.modal
   }
+}
 }
 </script>
 

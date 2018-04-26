@@ -1,16 +1,17 @@
 <template>
   <div class="Modal">
-    <Modal v-model="modal"
-           :title="modalData[1]"
-           @on-ok="ok"
-           @on-cancel="cancel">
-      {{modalData[0]}}
+    <Modal
+        v-model="modal"
+        :title="modalData[1]"
+        @on-ok="ok"
+        @on-cancel="cancel">
+        {{modalData[0]}}
     </Modal>
   </div>
 </template>
 
 <script>
-export default {
+export default{
   props: ['modal', 'changeModal', 'modalData'],
   methods: {
     ok () {

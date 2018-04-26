@@ -19,7 +19,8 @@
                   type="trash-a deleteIcon"
                   title="删除"></Icon>
           </div>
-          <rcTable :tableAttr="tableAttr"></rcTable>
+          <rcTable :data="tableData"
+                   :tableAttr="tableAttr"></rcTable>
         </div>
       </div>
       <ModuleForm :modal="modal"
@@ -45,6 +46,7 @@ export default {
       modal: false,
       spinShow: true,
       modalData: [0, '新增', {}],
+      baseData: [],
       tableAttr: {
         url: 'http://localhost:3001/refresh',
         params: {},

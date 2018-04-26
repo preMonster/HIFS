@@ -2,18 +2,16 @@ import axios from 'axios'
 
 export default {
   get (data) {
-    axios
-      .get(data.url, data.param ? data.param : {})
+    axios.get(data.url, data.param ? data.param : {})
       .then(data.success)
-      .catch(response => {
+      .catch((response) => {
         console.log(response)
       })
   },
   post (data) {
-    axios
-      .post(data.url, data.param ? data.param : {})
+    axios.post(data.url, data.param ? data.param : {})
       .then(data.success)
-      .catch(response => {
+      .catch((response) => {
         console.log(response)
       })
   }

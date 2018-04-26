@@ -19,7 +19,8 @@
                   type="trash-a deleteIcon"
                   title="删除"></Icon>
           </div>
-          <rcTable :tableAttr="tableAttr"></rcTable>
+          <rcTable :data="tableData"
+                   :tableAttr="tableAttr"></rcTable>
         </div>
       </div>
       <ModuleForm :modal="modal"

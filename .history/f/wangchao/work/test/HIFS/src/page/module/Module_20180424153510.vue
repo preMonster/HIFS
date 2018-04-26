@@ -19,7 +19,8 @@
                   type="trash-a deleteIcon"
                   title="删除"></Icon>
           </div>
-          <rcTable :tableAttr="tableAttr"></rcTable>
+          <rcTable :data="tableData"
+                   :tableAttr="tableAttr"></rcTable>
         </div>
       </div>
       <ModuleForm :modal="modal"
@@ -45,9 +46,8 @@ export default {
       modal: false,
       spinShow: true,
       modalData: [0, '新增', {}],
+      baseData: [],
       tableAttr: {
-        url: 'http://localhost:3001/refresh',
-        params: {},
         stripe: false, // 是否显示间隔斑马纹 默认false
         border: true, // 是否显示纵向边框 默认false
         showHeader: true, // 是否显示表头，默认true
@@ -62,10 +62,9 @@ export default {
         noFilteredDataText: '', // 列筛选时，数据为空时显示，默认暂无筛选结果
         columnsChooseShow: true, // 是否展示列选择框
         showExportBtns: true, // 是否展示默认导出栏
-        searchShow: true, // 是否展示搜索组件
         pageData: {
           show: true, // 是否展示分页
-          pageWays: 'serve', // client 客户端，serve 服务端， 默认服务端
+          pageWays: 'client', // client 客户端，serve 服务端， 默认服务端
           current: 1, // 当前页码
           pageSize: 5, // 每页条数
           pageSizeOpts: [5, 10, 20, 40], // 每页条数切换的配置
