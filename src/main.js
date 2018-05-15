@@ -7,7 +7,8 @@ import iView from 'iview'
 import 'iview/dist/styles/iview.css'
 import axios from 'axios'
 
-Vue.prototype.$ajax = axios
+axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
+Vue.prototype.$axios = axios
 
 Vue.config.productionTip = false
 

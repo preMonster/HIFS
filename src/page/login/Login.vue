@@ -7,18 +7,16 @@
           <i-form ref="formInline"
                   :model="formInline"
                   :rules="ruleInline">
-            <Form-item prop="user">
+            <FormItem prop="userName">
               <i-input type="text"
-                       :value.sync="formInline.user"
-                       v-model="formInline.user"
+                       v-model="formInline.userName"
                        placeholder="Username">
                 <Icon type="ios-person-outline"
                       slot="prepend"></Icon>
               </i-input>
-            </Form-item>
+            </FormItem>
             <Form-item prop="password">
               <i-input type="password"
-                       :value.sync="formInline.password"
                        v-model="formInline.password"
                        placeholder="Password">
                 <Icon type="ios-locked-outline"
@@ -37,47 +35,49 @@
 </template>
 
 <script>
-// import ajax from '@/util/ajax'
+import ajax from '@/util/ajax'
 
 export default {
   name: 'login',
   data: function () {
     return {
       formInline: {
-        user: '',
+        userName: '',
         password: ''
       },
       ruleInline: {
-        user: [
+        userName: [
           { required: true, message: '请填写用户名', trigger: 'blur' }
         ],
         password: [
           { required: true, message: '请填写密码', trigger: 'blur' },
-          { type: 'string', min: 6, message: '密码长度不能小于6位', trigger: 'blur' }
+          { type: 'string', min: 6, max: 12, message: '密码长度不能小于6位,不能大于12', trigger: 'blur' }
         ]
       }
     }
   },
   methods: {
     handleSubmit (name) {
+      let that = this
       this.$refs[name].validate((valid) => {
         if (valid) {
-          // ajax.post({
-          //   url: '',
-          //   param: that.formInline,
-          //   success: res => {
-          //     if(res.data.flag==='true'){
-          //       this.$Message.success('提交成功!')
-          //       localStorage.setItem('user', res.data.user.id)
-          //       this.$router.push('/')
-          //     }else{
-          //       this.$Message.error(res.data)
-          //     }
-          //   }
-          // })
-          this.$Message.success('登录成功!')
-          localStorage.setItem('user', '22')
-          this.$router.push('/')
+          let param = new URLSearchParams()
+          for (let i in that.formInline) {
+            param.append(i, that.formInline[i])
+          }
+          ajax.post({
+            url: 'api/hifs/user/checkUser',
+            param: param,
+            success: res => {
+              if (res.data.flag === true) {
+                this.$Message.success('提交成功!')
+                localStorage.setItem('user', res.data.user.id)
+                this.$router.push('/')
+              } else {
+                this.$Message.error(res.data.error)
+              }
+            }
+          })
         } else {
           this.$Message.error('表单验证失败!')
         }

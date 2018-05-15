@@ -38,7 +38,7 @@ export default {
 
 <style>
 .icons-div {
-    width: 602px;
+    width: 100%;
     height: 300px;
     border: 1px #ccc solid;
     overflow-y: auto;

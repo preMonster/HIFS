@@ -1,30 +1,30 @@
 <template>
   <div>
-    <ModuleTitle :iconName="'paper-airplane'"
-                 :moduleName="'模块管理'"></ModuleTitle>
-    <Card class="module-card">
-      <div class="module-card-flex-box">
-        <div class="left-module-div">
-          <Tree :data="baseData"
-                @on-select-change="getSelectedTree"></Tree>
+    <ModuleTitle :iconName="'paper-airplane'" :moduleName="'模块管理'"></ModuleTitle>
+    <Card class='module-card'>
+      <div class='module-card-flex-box'>
+        <div class='left-module-div'>
+          <Tree :data='baseData' @on-select-change='getSelectedTree'></Tree>
         </div>
-        <div class="right-module-div">
-          <div class="toolbars">
-            <div style="display:inline-block"
-                 @click="changeModal(0)">
-              <Icon type="ios-plus addIcon"
-                    title="新增"></Icon>
+        <div class='right-module-div'>
+          <div class='toolbars'>
+            <div style='display:inline-block' @click='changeModal(0)'>
+              <Icon type='ios-plus addIcon' title='新增'></Icon>
             </div>
-            <Icon @click="changeDeleteModal()"
-                  type="trash-a deleteIcon"
-                  title="删除"></Icon>
+            <div style='display:inline-block' @click='changeDeleteModal()'>
+              <Icon type='trash-a deleteIcon' title='删除'></Icon>
+            </div>
           </div>
-          <rcTable :tableAttr="tableAttr"></rcTable>
+          <div class='table-container'>
+            <rcTable ref="rcTable" :tableAttr='tableAttr' :onSelectChange="onSelectChange"></rcTable>
+          </div>
         </div>
       </div>
-      <ModuleForm :modal="modal"
+      <ModuleForm ref="modal"
                   :changeModal='changeModal'
-                  :modalData='modalData'></ModuleForm>
+                  :modalData='modalData'
+                  :treeData="baseData"
+                  :save="save"></ModuleForm>
     </Card>
   </div>
 </template>
@@ -45,8 +45,9 @@ export default {
       modal: false,
       spinShow: true,
       modalData: [0, '新增', {}],
+      baseData: [],
       tableAttr: {
-        url: 'http://localhost:3001/refresh',
+        url: 'api/hifs/module/getModulesByPage',
         params: {},
         stripe: false, // 是否显示间隔斑马纹 默认false
         border: true, // 是否显示纵向边框 默认false
@@ -61,7 +62,7 @@ export default {
         noDataText: '', // 数据为空时显示的提示内容，默认暂无数据
         noFilteredDataText: '', // 列筛选时，数据为空时显示，默认暂无筛选结果
         columnsChooseShow: true, // 是否展示列选择框
-        showExportBtns: true, // 是否展示默认导出栏
+        showExportBtns: false, // 是否展示默认导出栏
         searchShow: true, // 是否展示搜索组件
         pageData: {
           show: true, // 是否展示分页
@@ -78,22 +79,33 @@ export default {
             type: 'selection',
             width: 60,
             align: 'center'
-          }, {
+          },
+          {
             title: '模块名',
             key: 'name'
-          }, {
+          },
+          {
             title: '模块编码',
             key: 'code'
-          }, {
+          },
+          {
             title: '父级模块',
             key: 'parentName',
             render (h, params) {
-              return h('p', {}, params.row.parentName ? params.row.parentName : '-')
-            }
-          }, {
+              return h(
+                'p',
+                {},
+                params.row.parentName ? params.row.parentName : '-'
+              )
+            },
+            disabledSearch: true
+          },
+          {
             title: '等级',
-            key: 'level'
-          }, {
+            key: 'level',
+            disabledSearch: true
+          },
+          {
             title: '图标',
             key: 'iconName',
             align: 'center',
@@ -106,53 +118,69 @@ export default {
                   class: 'font-size18'
                 })
               ])
-            }
-          }, {
+            },
+            disabledSearch: true
+          },
+          {
             title: '地址',
-            key: 'url',
+            key: 'addres',
             align: 'center',
+            disabledSearch: true,
             render (h, params) {
-              return h('p', {}, params.row.url ? params.row.url : '-')
+              return h('p', {}, params.row.addres ? params.row.addres : '-')
             }
-          }, {
+          },
+          {
             title: '操作',
             key: 'action',
             width: 150,
             align: 'center',
-            render (h, params) {
+            disabledSearch: true,
+            render: (h, params) => {
               return h('p', [
-                h('i-button', {
-                  props: {
-                    type: 'primary',
-                    size: 'small'
-                  },
-                  class: 'margin-right5',
-                  on: {
-                    click: () => {
-                      params.row.show(params.index)
+                h(
+                  'Button',
+                  {
+                    props: {
+                      type: 'primary',
+                      size: 'small'
+                    },
+                    class: 'margin-right5',
+                    on: {
+                      click: () => {
+                        this.show(params.row)
+                      }
                     }
-                  }
-                }, '查看'),
-                h('i-button', {
-                  props: {
-                    type: 'warning',
-                    size: 'small'
                   },
-                  on: {
-                    click: () => {
-                      params.row.edit(params.index)
+                  '查看'
+                ),
+                h(
+                  'Button',
+                  {
+                    props: {
+                      type: 'warning',
+                      size: 'small'
+                    },
+                    on: {
+                      click: () => {
+                        this.edit(params.row)
+                      }
                     }
-                  }
-                }, '修改')
+                  },
+                  '修改'
+                )
               ])
             }
-          }]
+          }
+        ]
       },
       showFunc: this.show,
       tableData: {
         total: 0,
         data: []
-      }
+      },
+      chooseTreeData: {},
+      chooseRows: []
     }
   },
   components: {
@@ -162,24 +190,17 @@ export default {
     rcTable
   },
   created: function () {
-    ajax.get({
-      url: 'static/module.json',
-      success: res => {
-        this.baseData = res.data.data
-        this.tableData = res.data
-        for (let i in this.tableData.data) {
-          this.tableData.data[i].show = this.show
-          this.tableData.data[i].edit = this.edit
-        }
-      }
-    })
+    this.getTreeData()
   },
   methods: {
     getIconName (iconName) {
       this.iconName = iconName
     },
     getSelectedTree (data) {
-      console.log(data)
+      let param = new URLSearchParams()
+      param.append('parent_code', data[0].code)
+      this.chooseTreeData = data[0]
+      this.$refs.rcTable.refreshTable(param)
     },
     show (index) {
       this.changeModal(1, index)
@@ -188,9 +209,68 @@ export default {
       this.changeModal(2, index)
     },
     changeModal (num, index) {
-      let data = index ? this.tableData[index] : []
-      this.modalData = num === 0 ? [0, '新增', data] : num === 1 ? [1, '查看', data] : [2, '编辑', data]
-      this.modal = !this.modal
+      let data = index
+      let title = num === 0 ? '新增' : num === 1 ? '查看' : num === 2 ? '编辑' : ''
+      this.modalData = [num, title, data]
+      this.$refs.modal.openTheModal()
+    },
+    changeDeleteModal () {
+      let that = this
+      let rows = this.chooseRows
+      if (rows.length === 0) {
+        this.$Modal.error({
+          title: '删除',
+          content: '请选择删除项！'
+        })
+      } else {
+        this.$Modal.error({
+          title: '删除',
+          content: '确认删除？',
+          onOk: function () {
+            let param = new URLSearchParams()
+            param.append('modules', JSON.stringify(rows))
+            ajax.post({
+              url: 'api/hifs/module/deleteModule',
+              param: param,
+              success: res => {
+                let param = new URLSearchParams()
+                if (that.chooseTreeData.code) {
+                  param.append('parent_code', that.chooseTreeData.code)
+                }
+                that.getTreeData()
+                that.$refs.rcTable.refreshTable(param)
+              }
+            })
+          }
+        })
+      }
+    },
+    save (params) {
+      const that = this
+      ajax.post({
+        url: 'api/hifs/module/save',
+        param: params,
+        success: res => {
+          let param = new URLSearchParams()
+          if (that.chooseTreeData.code) {
+            param.append('parent_code', that.chooseTreeData.code)
+          }
+          that.getTreeData()
+          that.$refs.rcTable.refreshTable(param)
+        }
+      })
+    },
+    onSelectChange (selectedRows) {
+      this.chooseRows = selectedRows
+    },
+    getTreeData () {
+      ajax.get({
+        url: 'api/hifs/module/getModuleTrees',
+        success: res => {
+          let data = [ res.data ]
+          this.baseData = data
+        }
+      })
     }
   }
 }
@@ -198,70 +278,79 @@ export default {
 
 <style>
 .module-card-flex-box {
-    display: flex;
-    min-height: 500px;
+  padding-left: 200px;
+  min-height: 500px;
+  position: relative;
 }
 
 .left-module-div {
-    width: 200px;
-    border-right: 1px #ccc solid;
+  width: 200px;
+  height: 100%;
+  border-right: 1px #ccc solid;
+  position: absolute;
+  left: 0;
+  top: 0;
 }
 
 .right-module-div {
-    width: 100%;
-    padding: 0px 30px;
-    position: relative;
+  width: 100%;
+  padding: 0px 30px;
+  position: relative;
 }
 
 .font-size18 {
-    font-size: 18px;
+  font-size: 18px;
 }
 
 .margin-right5 {
-    margin-right: 5px;
+  margin-right: 5px;
 }
+
 .toolbars {
-    font-size: 18px;
-    text-align: right;
-    padding: 10px 20px;
+  font-size: 18px;
+  text-align: right;
+  padding: 10px 20px;
 }
 
 .addIcon {
-    color: #00cb66;
-    margin-right: 5px;
-    position: relative;
-    top: -2px;
+  color: #00cb66;
+  margin-right: 5px;
+  position: relative;
+  top: -2px;
 }
 
 .deleteIcon {
-    font-size: 22px;
-    color: red;
+  font-size: 22px;
+  color: red;
 }
+
 .page {
-    margin-top: 10px;
-    text-align: right;
+  margin-top: 10px;
+  text-align: right;
 }
 
 .demo-spin-icon-load {
-    animation: ani-demo-spin 1s linear infinite;
+  animation: ani-demo-spin 1s linear infinite;
 }
+
 @keyframes ani-demo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    50% {
-        transform: rotate(180deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+  from {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
+
 .demo-spin-col {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    border: 1px solid #eee;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 1px solid #eee;
 }
 </style>

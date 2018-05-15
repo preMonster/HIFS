@@ -6,98 +6,36 @@
     </div>
     <div class="sidebarContent">
       <Menu theme="dark">
-        <Submenu name="xtgl"
-                 key="1">
+        <Submenu v-for="item in data"
+                 v-if="item.children.length>0"
+                 :name="item.id"
+                 :key="item.id">
           <template slot="title">
-            <Icon type="gear-b"></Icon>
-            系统管理
+            <Icon :type="item.iconName"></Icon>
+            {{item.name}}
           </template>
-          <router-link :to="'/module'">
-            <Menu-item name="mkgl"
-                       key="1-1">
-              <Icon type="paper-airplane"></Icon>
-              模块管理</Menu-item>
+          <router-link v-if="item.name !== '统计分析'" v-for="child in item.children" :to="child.addres" :key="child.id">
+            <Menu-item :name="child.id"
+                       :key="child.id">
+              <Icon :type="child.iconName"></Icon>
+              {{child.name}}</Menu-item>
           </router-link>
-          <Menu-item name="jsgl"
-                     key="1-2">
-            <Icon type="paper-airplane"></Icon>
-            角色管理</Menu-item>
-          <Menu-item name="jsfp"
-                     key="1-3">
-            <Icon type="paper-airplane"></Icon>
-            角色分配</Menu-item>
-          <Menu-item name="yhgl"
-                     key="1-4">
-            <Icon type="paper-airplane"></Icon>
-            用户管理</Menu-item>
-        </Submenu>
-        <Submenu name="jcgl"
-                 key="2">
-          <template slot="title">
-            <Icon type="home"></Icon>
-            基础管理
-          </template>
-          <Menu-item name="qugl"
-                     key="2-1">
-            <Icon type="paper-airplane"></Icon>
-            区域管理</Menu-item>
-          <Menu-item name="clxq"
-                     key="2-2">
-            <Icon type="paper-airplane"></Icon>
-            车辆详情</Menu-item>
-          <Menu-item name="wfjcxx"
-                     key="2-3">
-            <Icon type="paper-airplane"></Icon>
-            违法基础信息</Menu-item>
-        </Submenu>
-        <Submenu name="wfqz"
-                 key="3">
-          <template slot="title">
-            <Icon type="ios-people"></Icon>
-            违法取证
-          </template>
-          <Menu-item name="wfjl"
-                     key="3-1">
-            <Icon type="paper-airplane"></Icon>
-            违法记录</Menu-item>
-          <Menu-item name="lsjl"
-                     key="3-2">
-            <Icon type="paper-airplane"></Icon>
-            违法历史记录</Menu-item>
-        </Submenu>
-        <Submenu name="tjfx"
-                 key="4">
-          <template slot="title">
-            <Icon type="stats-bars"></Icon>
-            统计分析
-          </template>
-          <Menu-group title="高发">
-            <Menu-item name="jcfx"
-                       key="4-1">
-              <Icon type="paper-airplane"></Icon>
-              基础路段</Menu-item>
-            <Menu-item name="yzfx"
-                       key="4-2">
-              <Icon type="paper-airplane"></Icon>
-              严重路段分析</Menu-item>
+          <Menu-group v-if="isTong(item, false)" title="高发">
+            <router-link v-for="tong1 in tongData1" :to="tong1.addres" :key="tong1.id">
+              <Menu-item :name="tong1.id"
+                         :key="tong1.id">
+                <Icon :type="tong1.iconName"></Icon>
+                {{tong1.name}}</Menu-item>
+            </router-link>
           </Menu-group>
-          <Menu-group title="个人">
-            <Menu-item name="grfx"
-                       key="4-3">
-              <Icon type="paper-airplane"></Icon>
-              个人违法分析</Menu-item>
+          <Menu-group v-if="isTong(item, true)" title="个人">
+            <router-link v-for="tong2 in tongData2" :to="tong2.addres" :key="tong2.id">
+              <Menu-item :name="tong2.id"
+                         :key="tong2.id">
+                <Icon :type="tong2.iconName"></Icon>
+                {{tong2.name}}</Menu-item>
+            </router-link>
           </Menu-group>
-        </Submenu>
-        <Submenu name="spgl"
-                 key="5">
-          <template slot="title">
-            <Icon type="videocamera"></Icon>
-            违法视频管理
-          </template>
-          <Menu-item name="sphf"
-                     key="5-1">
-            <Icon type="paper-airplane"></Icon>
-            视频回放</Menu-item>
         </Submenu>
       </Menu>
     </div>
@@ -105,8 +43,65 @@
 </template>
 
 <script>
+import ajax from '@/util/ajax.js'
 export default {
-  name: 'Sidbar'
+  name: 'Sidbar',
+  data: () => {
+    return {
+      data: [],
+      tongData1: [],
+      tongData2: []
+    }
+  },
+  created () {
+    let that = this
+    let userId = localStorage.getItem('user')
+    ajax.get({
+      url: 'api/hifs/module/getModulesTreeByuserId?userId=' + userId,
+      success: function (res) {
+        that.data = res.data
+        let treeData = res.data
+        for (let i in treeData) {
+          if (treeData[i].name === '统计分析') {
+            that.getTong(treeData[i])
+          }
+        }
+      }
+    })
+  },
+  methods: {
+    isTong (data, self) {
+      let result = false
+      let children = data.children
+      if (data.name === '统计分析' && children.length > 0) {
+        if (self && this.tongData2.length > 0) {
+          result = true
+        }
+
+        if (!self && this.tongData1.length > 0) {
+          result = true
+        }
+      }
+
+      return result
+    },
+    getTong (data) {
+      let children = data.children
+      if (data.name === '统计分析' && children.length > 0) {
+        for (let i in children) {
+          if (children[i].name === '基础路段') {
+            this.tongData1.push(children[i])
+          }
+          if (children[i].name === '严重路段分析') {
+            this.tongData1.push(children[i])
+          }
+          if (children[i].name === '个人违法分析') {
+            this.tongData2.push(children[i])
+          }
+        }
+      }
+    }
+  }
 }
 </script>
 

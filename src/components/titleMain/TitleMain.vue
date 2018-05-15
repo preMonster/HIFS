@@ -12,7 +12,7 @@
         <div class="infoContent">
           <div class="headImg">
             <img class="img"
-                 :src="'/static/image/'+userInfo.headImg" />
+                 :src="'/static/image/head.png'" />
           </div>
           <div class="userName">{{userInfo.realName}}</div>
         </div>
@@ -30,7 +30,7 @@
                    type="file" />
             <img @click="chooseFile"
                  class="imgLarge"
-                 :src="'/static/image/'+userInfo.headImg" />
+                 :src="'/static/image/head.png'" />
           </div>
           <div class="user-info-name mar-top-bot10">{{userInfo.realName}} (
             <span> {{userInfo.roleName}} </span>)</div>
@@ -79,11 +79,10 @@ export default {
       that.time = new Date()
     }, 1000)
 
+    let userId = localStorage.getItem('user')
+
     ajax.get({
-      url: 'static/test.json',
-      param: {
-        id: localStorage.getItem('user')
-      },
+      url: 'api/hifs/user/getUserById?userId=' + userId,
       success: res => {
         that.userInfo = res.data
       }
@@ -118,12 +117,22 @@ export default {
       this.userInfo = data
     },
     edit () {
-      this.editState = this.editState === 0 ? 1 : 0
-      this.loading = true
       let that = this
-      setTimeout(function () {
-        that.loading = false
-      }, 1000)
+      if (this.editState === 1) {
+        this.loading = true
+        let param = new URLSearchParams()
+        for (let i in this.userInfo) {
+          param.append(i, this.userInfo[i])
+        }
+        ajax.post({
+          url: 'api/hifs/user/save',
+          param: param,
+          success: res => {
+            that.loading = false
+          }
+        })
+      }
+      this.editState = this.editState === 0 ? 1 : 0
     },
     outLogin () {
       localStorage.removeItem('user')
