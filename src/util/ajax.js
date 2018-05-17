@@ -11,7 +11,7 @@ export default {
   },
   post (data) {
     axios
-      .post(data.url, data.param ? data.param : {})
+      .post(data.url, data.param ? data.param : {}, data.config ? data.config : {})
       .then(data.success)
       .catch(response => {
         console.log(response)

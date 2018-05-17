@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "echarts": "^4.1.0",
     "iview": "^2.11.0",
     "less": "^3.0.2",
     "less-loader": "^4.1.0",

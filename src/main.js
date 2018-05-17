@@ -6,9 +6,11 @@ import router from './router'
 import iView from 'iview'
 import 'iview/dist/styles/iview.css'
 import axios from 'axios'
+import echarts from 'echarts'
 
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 Vue.prototype.$axios = axios
+Vue.prototype.$echarts = echarts
 
 Vue.config.productionTip = false
 
