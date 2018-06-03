@@ -11,6 +11,9 @@ import Monitor from '@/page/monitor/Monitor'
 import IllegalBaseInfo from '@/page/illegalBaseInfo/IllegalBaseInfo'
 import Record from '@/page/record/Record'
 import BaseAnaly from '@/page/baseAnaly/BaseAnaly'
+import SeriousAnaly from '@/page/seriousAnaly/SeriousAnaly'
+import SelfAnaly from '@/page/selfAnaly/SelfAnaly'
+import Video from '@/page/video/Video'
 
 Vue.use(Router)
 
@@ -47,6 +50,15 @@ export default new Router({
         }, {
           path: '/baseAnaly',
           component: BaseAnaly
+        }, {
+          path: '/seriousAnaly',
+          component: SeriousAnaly
+        }, {
+          path: '/selfAnaly',
+          component: SelfAnaly
+        }, {
+          path: '/video',
+          component: Video
         }
       ]
     },

@@ -1,3 +1,16 @@
 server:
   port: 8000
   context-path: /hifs
+spring:
+  datasource:
+    druid: 
+      filters: stat,log4j,wall 
+      validation-query: select 1
+      validation-query-timeout: 10000 
+      test-on-borrow: true 
+      test-on-return: false
+      test-while-idle: true
+      time-between-eviction-runs-millis: 5000
+devtools:  
+    livereload:  
+      enabled: true  

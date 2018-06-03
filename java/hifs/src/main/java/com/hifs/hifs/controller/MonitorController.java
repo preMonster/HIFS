@@ -114,6 +114,39 @@ public class MonitorController {
     }
     
 
+
+    @GetMapping(value="getAreaMonitor")
+    public Object getAreaMonitor(){
+    	
+        String params = " id as value, name as label ";
+
+        String condition = " is_monitor = 1 ";
+        
+    	String sql = ed.getSearchSql(params, "area", null, condition, null, null, null, null);
+
+        Query query  = getData(sql);
+        
+        query.unwrap(SQLQuery.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        
+        List<Map<String, Object>> list = query.getResultList();
+        
+        for(int i=0;i<list.size();i++){
+
+            String params1 = " id as value, name as label ";
+
+            String condition1 = " is_run = 1 AND area_id = "+list.get(i).get("value")+" ";
+            
+        	String sql1 = ed.getSearchSql(params1, "monitor", null, condition1, null, null, null, null);
+
+            Query query1  = getData(sql1);
+            query1.unwrap(SQLQuery.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+            
+            list.get(i).put("children", query1.getResultList());
+        }
+        return list;
+    }
+    
+
     private Query getData(String sql){
         EntityManager em = emf.createEntityManager();
 

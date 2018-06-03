@@ -16,7 +16,7 @@
         <FormItem label="所属区域"
                   prop="areaId">
             <Select v-model="formData.areaId" placeholder="选择所属区域" :disabled="modalData[0]===1">
-                <Option v-for="(item, index) in areaList" :value="item.id" :key="index">{{item.name}}</Option>
+                <Option v-for="(item, index) in areaList" :value="item.id + ''" :key="index">{{item.name}}</Option>
             </Select>
         </FormItem>
         <FormItem label="是否运行"
@@ -69,6 +69,7 @@ export default {
         this.formData.areaId = data.areaId
         this.formData.isRun = data.isRun
         this.formData.mtorDescribe = data.mtorDescribe
+        console.log(this.formData)
       }
     }
   },

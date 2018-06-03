@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.SQLQuery;
 import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -112,6 +113,186 @@ public class RecordController {
         }
         rs.deleteInBatch(list);
         return null;
+    }
+    
+    
+    @GetMapping(value = "/getPieRecords")
+    public Object getPieRecords(@RequestParam(value = "year",required = false, defaultValue = "") String year,
+    		@RequestParam(value = "monitorId",required = false, defaultValue = "") String monitorId,
+    		@RequestParam(value = "uNo",required = false, defaultValue = "") String uNo){
+
+        String params = " illegal_type as name, COUNT(illegal_type) as value ";
+
+        String condition = " 1=1 ";
+
+        if(StringUtils.isNotBlank(year)){
+            condition += " and date_format(STR_TO_DATE(r.begin_date, '%Y'), '%Y') = "+year+" ";
+        }
+
+        if(StringUtils.isNotBlank(monitorId)){
+            condition += " and r.monitor_id = '"+monitorId+"' ";
+        }
+
+        if(StringUtils.isNotBlank(uNo)){
+            condition += " and r.uNo = '"+uNo+"' ";
+        }
+        
+        String group = " illegal_type ";
+
+        String sql = ed.getSearchSql(params, "record r", null, condition, null, null, group, null);
+
+        Query query  = getData(sql);
+        query.unwrap(SQLQuery.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+
+
+        return query.getResultList();
+    }
+    
+    @PostMapping(value = "/getTRecords")
+    public Object getTRecords(String monitorId, String year, String uNo){
+
+        String params = " area.`name` AS area, m. NAME AS monitor, COUNT(illegal_type) AS totalType ";
+
+        String condition = " 1=1 ";
+
+        if(StringUtils.isNotBlank(monitorId)){
+            condition += " and r.monitor_id = '"+monitorId+"' ";
+        }
+
+        if(StringUtils.isNotBlank(year)){
+            condition += " and date_format(STR_TO_DATE(r.begin_date, '%Y'), '%Y') = "+year+" ";
+        }
+
+        if(StringUtils.isNotBlank(uNo)){
+            condition += " and r.uno = '"+uNo+"' ";
+        }
+        
+        String group = " monitor_id ";
+        
+        String join = " LEFT JOIN monitor m ON m.id = r.monitor_id LEFT JOIN area ON area.id = m.area_id ";
+
+        String sql = ed.getSearchSql(params, "record r", join, condition, null, null, group, null);
+
+        Query query  = getData(sql);
+        query.unwrap(SQLQuery.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+
+
+
+        Map<String,Object> result = new HashMap<String,Object>();
+
+        result.put("total", 0);
+        result.put("data", query.getResultList());
+        return result;
+    }
+    
+    @GetMapping(value = "/getLineRecords")
+    public Object getLineRecords(@RequestParam(value = "year",required = false, defaultValue = "") String year,
+    @RequestParam(value = "monitorId",required = false, defaultValue = "") String monitorId){
+    	
+    	String params1 = " m.*, m.area_id AS areaId, m.is_run AS isRun, m.mtor_describe AS mtorDescribe, a. NAME AS areaName ";
+
+        String condition1 = " 1=1 and m.is_run = '1' and a.is_monitor = '1' ";
+
+        if(StringUtils.isNotBlank(monitorId)){
+            condition1 += " and m.id = '"+monitorId+"' ";
+        }
+        
+        String join1 = " LEFT JOIN area a ON a.id = m.area_id ";
+        
+    	String sql1 = ed.getSearchSql(params1, "monitor m", join1, condition1, null, null, null, null);
+
+        Query query1  = getData(sql1);
+        query1.unwrap(SQLQuery.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        
+        List<Map<String,Object>> list = query1.getResultList();
+        
+        List result = new ArrayList<Map<String,Object>>();
+        
+        for(int i = 0; i<list.size();i++){
+        	Map<String, Object> map = new HashMap<String, Object>();
+        	map.put("monitor", list.get(i).get("areaName")+"/"+list.get(i).get("name"));
+        	String params = " COUNT(illegal_type) AS num, date_format( STR_TO_DATE(r.begin_date, '%Y-%m'), '%m' ) as month ";
+
+            String condition = " 1=1 and monitor_id = "+list.get(i).get("id")+" ";
+
+            if(StringUtils.isNotBlank(year)){
+                condition += " and date_format(STR_TO_DATE(r.begin_date, '%Y'), '%Y') = "+year+" ";
+            }
+            
+            String group = " date_format( STR_TO_DATE(r.begin_date, '%Y-%m'), '%m' ) ";
+
+            String order = " date_format( STR_TO_DATE(r.begin_date, '%Y-%m'), '%m' ) asc ";
+            
+            String sql = ed.getSearchSql(params, "record r", null, condition, null, null, group, order);
+
+            Query query  = getData(sql);
+            query.unwrap(SQLQuery.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+            
+            map.put("data", query.getResultList());
+            result.add(map);
+        }
+        
+        return result;
+    }
+
+    
+    
+    @PostMapping(value = "/getSelfTRecords")
+    public Object getSelfTRecords(String uNo, String monitorId, String year){
+
+        String params = " r.*, r.illegal_type AS illegalType, r.monitor_id AS monitorId, r.people_name AS peopleName, r.begin_date AS beginDate, r.end_date AS endDate, m.`name` AS monitorName, a. NAME AS area  ";
+
+        String condition = " 1=1 ";
+
+        if(StringUtils.isNotBlank(monitorId)){
+            condition += " and r.monitor_id = '"+monitorId+"' ";
+        }
+
+        if(StringUtils.isNotBlank(year)){
+            condition += " and date_format(STR_TO_DATE(r.begin_date, '%Y'), '%Y') = "+year+" ";
+        }
+
+        if(StringUtils.isNotBlank(uNo)){
+            condition += " and r.uno = '"+uNo+"' ";
+        }
+        
+        String join = " LEFT JOIN monitor m ON m.id = r.monitor_id LEFT JOIN area a ON a.id = m.area_id ";
+
+        String sql = ed.getSearchSql(params, "record r", join, condition, null, null, null, null);
+
+        Query query  = getData(sql);
+        query.unwrap(SQLQuery.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+
+
+
+        Map<String,Object> result = new HashMap<String,Object>();
+
+        result.put("total", 0);
+        result.put("data", query.getResultList());
+        return result;
+    }
+
+    
+    
+    @GetMapping(value = "/getHighMonitorInfo")
+    public Object getHighMonitorInfo(@RequestParam(value = "year",required = false, defaultValue = "") String year){
+
+        String params = " area.`name` AS area, m. NAME AS monitor, monitor_id as monitorId, COUNT(illegal_type) AS totalType ";
+
+        String condition = " 1=1 ";
+
+        if(StringUtils.isNotBlank(year)){
+            condition += " and date_format( STR_TO_DATE(r.begin_date, '%Y-%m'), '%Y' ) = "+year+" ";
+        }
+        String group = " monitor_id HAVING totalType > 1 ";
+        
+        String join = " LEFT JOIN monitor m ON m.id = r.monitor_id LEFT JOIN area ON area.id = m.area_id ";
+
+        String sql = ed.getSearchSql(params, "record r", join, condition, null, null, group, null);
+
+        Query query  = getData(sql);
+        query.unwrap(SQLQuery.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        return query.getResultList();
     }
     
 

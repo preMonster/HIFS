@@ -104,6 +104,8 @@ export default {
     modalData (newModalData) {
       if (newModalData[2]) {
         const data = newModalData[2]
+        let bd = new Date(data.beginDate)
+        let ed = new Date(data.endDate)
         this.formData.id = data.id
         this.formData.illegalType = data.illegalType
         this.formData.peopleName = data.peopleName
@@ -112,8 +114,8 @@ export default {
         this.formData.monitorId = data.monitorId
         this.formData.evidence = data.evidence
         this.date = [
-          data.beginDate,
-          data.endDate
+          bd,
+          ed
         ]
         this.imgDataUrl = data.evidence
       }
@@ -144,8 +146,8 @@ export default {
       }
       let beginDateStr = this.date[0]
       let endDateStr = this.date[1]
-      params.append('beginDate', beginDateStr)
-      params.append('endDate', endDateStr)
+      params.append('beginDate', this.getStrDate(beginDateStr))
+      params.append('endDate', this.getStrDate(endDateStr))
       if (this.file) {
         params.append('file', this.file)
       }
@@ -220,6 +222,14 @@ export default {
         }
         reader.readAsDataURL(file)
       }
+    },
+    getStrDate (str) {
+      let date = new Date(str)
+      return date.getFullYear() + '-' +
+                     (date.getMonth() + 1) + '-' +
+                     date.getDate() + ' ' +
+                     date.getHours() + ':' +
+                     date.getMinutes()
     }
   }
 }
