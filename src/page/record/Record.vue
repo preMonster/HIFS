@@ -4,11 +4,18 @@
         <Card class='module-card'>
           <div class="toolbars-container">
             <div class='toolbars'>
-              <div style='display:inline-block' @click='changeModal(0)'>
+              <div style='display:inline-block;' @click='changeModal(0)'>
                 <Icon type='ios-plus addIcon' title='新增'></Icon>
               </div>
               <div style='display:inline-block' @click='changeDeleteModal()'>
                 <Icon type='trash-a deleteIcon' title='删除'></Icon>
+              </div>
+              <div style='display:inline-block'>
+                <Upload
+                    :before-upload="handleUpload"
+                    action="//jsonplaceholder.typicode.com/posts/">
+                    <Button type="ghost" icon="ios-cloud-upload-outline">自动识别图片</Button>
+                </Upload>
               </div>
             </div>
           </div>
@@ -73,6 +80,11 @@ export default {
           {
             title: '电话',
             key: 'phone',
+            disabledSearch: true
+          },
+          {
+            title: '车牌号',
+            key: 'carno',
             disabledSearch: true
           },
           {
@@ -241,6 +253,22 @@ export default {
           that.$refs.rcTable.refreshTable(param)
         }
       })
+    },
+    handleUpload (file) {
+      let config = {
+        headers: {'Content-Type': 'multipart/form-data'}
+      }
+      let params = new FormData()
+      params.append('file', file)
+      ajax.post({
+        url: 'api/hifs/record/saveByImg',
+        param: params,
+        config: config,
+        success: res => {
+          console.log(res)
+        }
+      })
+      return false
     }
   }
 }

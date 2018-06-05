@@ -28,6 +28,11 @@
               <div id="myChart" class="card-content"></div>
             </div>
           </div>
+          <div class="line-card">
+            <div class="card-contaner">
+             <div id="slefContainer" class="map-container"></div>
+            </div>
+          </div>
         </Card>
     </div>
 </template>
@@ -36,6 +41,7 @@
 import ModuleTitle from '@/components/titleMain/ModuleTitle'
 import rcTable from '@/components/rcTable'
 import ajax from '@/util/ajax'
+import AMap from 'AMap' // 在页面中引入高德地图
 
 export default {
   name: 'SelfAnaly',
@@ -84,7 +90,7 @@ export default {
           },
           {
             title: '所属区域',
-            key: 'areaName',
+            key: 'area',
             disabledSearch: true
           },
           {
@@ -147,7 +153,9 @@ export default {
       tLegend: [],
       tData: [],
       lineLegend: [],
-      lineData: []
+      lineData: [],
+      map: {}, // 高德地图
+      polygon: {} // 高德地图区域渲染
     }
   },
   mounted () {
@@ -234,15 +242,20 @@ export default {
       param.append('uNo', this.uNo ? this.uNo : 'noBody')
       param.append('monitorId', this.value1[1] || '')
       param.append('year', this.year)
+      let that = this
       ajax.post({
         url: 'api/hifs/record/getTRecords',
         param: param,
         success: res => {
           let lArr = []
           let dArr = []
+          let areaList = []
           for (let i in res.data.data) {
             lArr.push(res.data.data[i].area + '/' + res.data.data[i].monitor)
             dArr.push(res.data.data[i].totalType)
+            let areas = res.data.data[i].area.split('/')
+            let areaName = areas[areas.length - 1]
+            areaList.push(areaName)
           }
           this.tLegend = lArr
           this.tData = dArr
@@ -270,6 +283,8 @@ export default {
               data: dArr
             }]
           })
+
+          that.loadmap(areaList)
         }
       })
     },
@@ -328,6 +343,67 @@ export default {
           })
         }
       })
+    },
+    loadmap (data) { // 初始化加载地图相关组件
+      if (!data) {
+        this.map = new AMap.Map('slefContainer', { // 地图初始化
+          zoom: 12
+        })
+        this.polygon = new AMap.Polygon({ // 行政区边界渲染，使用多边形覆盖物实现，初始化this.polygon状态
+          map: this.map,
+          strokeWeight: 1,
+          fillOpacity: 0.7,
+          fillColor: '#CCF3FF',
+          strokeColor: '#CC66CC'
+        })
+      } else {
+        this.map = new AMap.Map('slefContainer', { // 地图初始化
+          zoom: 12
+        })
+        this.polygon = new AMap.Polygon({ // 行政区边界渲染，使用多边形覆盖物实现，初始化this.polygon状态
+          map: this.map,
+          strokeWeight: 1,
+          fillOpacity: 0.7,
+          fillColor: '#CCF3FF',
+          strokeColor: '#CC66CC'
+        })
+        this.polygon.setMap(null) //  清空地图渲染，方便重新绘制地图
+        for (let i in data) {
+          this.serchMap(data[i])
+        }
+      }
+    },
+    serchMap (name) {
+      let districtSearch
+      let that = this
+      AMap.service('AMap.DistrictSearch', function () { // 回调函数
+        // 实例化DistrictSearch
+        districtSearch = new AMap.DistrictSearch({
+          extensions: 'all', // 设为all,才能得到渲染地图所需要的bouldes
+          level: 'country',
+          subdistrict: 1
+        })
+        // TODO:  使用districtSearch对象调用行政区查询的功能
+        districtSearch.setSubdistrict(1)
+        // TODO:  使用districtSearch对象调用行政区查询的功能
+        // 调用查询方法
+        districtSearch.search(name, function (status, result) {
+          // TODO :  按照自己需求处理查询结果
+          that.polygonMap(result.districtList[0]) // 根据坐标数组渲染区域
+        })
+      })
+    },
+    polygonMap (result) { // 渲染地图
+      this.polygon = new AMap.Polygon({ //  行政区边界渲染，使用多边形覆盖物实现
+        map: this.map,
+        strokeWeight: 1,
+        fillOpacity: 0.7,
+        fillColor: '#CCF3FF',
+        strokeColor: '#CC66CC'
+      })
+      this.polygon.setPath(result.boundaries) //  渲染地图通过查询地区所得到的数组
+      this.map.setFitView() //  地图自定义
+      this.map.setCenter(result.center) //  设置地图中心区域
     }
   }
 }
@@ -371,5 +447,10 @@ export default {
     width: 300px;
     margin: 0px 10px;
   }
+}
+
+.map-container{
+  width: 100%;
+  min-height: 100%;
 }
 </style>

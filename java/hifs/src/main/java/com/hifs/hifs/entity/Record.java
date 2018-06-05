@@ -26,6 +26,8 @@ public class Record {
 	private String endDate;
 	
 	private String evidence;
+	
+	private String carno;
 
     public Record() {
     }
@@ -100,6 +102,14 @@ public class Record {
 
 	public void setEvidence(String evidence) {
 		this.evidence = evidence;
+	}
+
+	public String getCarno() {
+		return carno;
+	}
+
+	public void setCarno(String carno) {
+		this.carno = carno;
 	}
 
 }

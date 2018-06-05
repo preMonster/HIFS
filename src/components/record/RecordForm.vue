@@ -27,6 +27,9 @@
                   prop="phone">
             <Input v-model="formData.phone" placeholder="电话" :disabled="modalData[0]===1"/>
         </FormItem>
+        <FormItem label="车牌号">
+            <Input v-model="formData.carno" placeholder="车牌号" :disabled="modalData[0]===1"/>
+        </FormItem>
         <FormItem label="监控节点"
                   prop="monitorId">
             <Select v-model="formData.monitorId" placeholder="选择监控节点" :disabled="modalData[0]===1">
@@ -74,6 +77,7 @@ export default {
         peopleName: '',
         uno: '',
         phone: '',
+        carno: '',
         monitorId: '',
         evidence: ''
       },
@@ -113,6 +117,7 @@ export default {
         this.formData.phone = data.phone
         this.formData.monitorId = data.monitorId
         this.formData.evidence = data.evidence
+        this.formData.carno = data.carno
         this.date = [
           bd,
           ed

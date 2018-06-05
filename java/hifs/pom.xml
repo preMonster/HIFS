@@ -88,6 +88,16 @@
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.userjar</groupId>
+            <artifactId>json</artifactId>
+            <version>1.1.0.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>com.userjar</groupId>
+            <artifactId>youtu-java-sdk</artifactId>
+            <version>1.1.0.RELEASE</version>
+        </dependency>
         
         <!--数据池Druid-->  
         <dependency>  

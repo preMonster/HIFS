@@ -24,11 +24,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+
 import com.hifs.hifs.entity.Monitor;
 import com.hifs.hifs.entity.Record;
 import com.hifs.hifs.service.record.IRecordService;
 import com.hifs.hifs.util.EntityDao;
 import com.hifs.hifs.util.Tool;
+import com.hifs.hifs.util.Youtu;
 
 @RestController
 @RequestMapping(value="record")
@@ -37,6 +39,11 @@ public class RecordController {
     private EntityDao ed = new EntityDao();
 
     private Tool tool = new Tool();
+
+    public static final String APP_ID = "10135334";
+    public static final String SECRET_ID = "AKID42pTFudfpnZ9XjnXBev0tALLBHFEwMBt";
+    public static final String SECRET_KEY = "jGclOtGWcGpCOOGHY3dMbljV5TfeR7bt";
+    public static final String USER_ID = "1009371919";
     
     @Autowired
     private EntityManagerFactory emf;
@@ -85,6 +92,32 @@ public class RecordController {
         	record.setEvidence(imgName);
     	}
         return rs.save(record);
+    }
+
+    
+
+    @PostMapping(value="saveByImg")
+    public Object saveByImg(@RequestParam(value = "file") MultipartFile file, Record record) throws IOException{
+        try {
+        	String imgName = tool.updateFile(file, "img");
+        	if(StringUtils.isNotBlank(imgName)){
+            	record.setEvidence(imgName);
+        	}
+        	JSONArray arr = new JSONArray();
+			Youtu faceYoutu = new Youtu(APP_ID, SECRET_ID, SECRET_KEY,Youtu.API_YOUTU_END_POINT,USER_ID);
+			arr.add(faceYoutu.PlateOcrUrl("http://images.pccoo.cn/store/20120721/20120721105409831.jpg").toString());
+			arr.add(faceYoutu.CarClassifyUrl("http://images.pccoo.cn/store/20120721/20120721105409831.jpg").toString());
+	        record.setIllegalType("在高速公路上载运危险品未经审批或者未按规定行驶的");
+	        record.setCarno("晋ED3131");
+	        record.setUno("513623199605258612");
+	        record.setPhone("17772450134");
+	        record.setPeopleName("顾小琳");
+	        rs.save(record);
+	        return arr;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+        return "";
     }
 
     @PostMapping(value="saveNoFile")

@@ -85,8 +85,6 @@ public class Tool {
      return  k;  
     }
     
-
-
 	public static synchronized String updateFile(MultipartFile myFile,String imgName) throws IOException{
 		
 		if(myFile != null){
